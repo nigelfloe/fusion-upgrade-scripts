@@ -119,10 +119,12 @@ def get_new_permissions(permissions, introspect_filename):
     new_permissions = list()
     for permission in permissions:
         converted_perms = convert_perms(permission, introspect_filename)
-        if convert_perms is list:
+        if isinstance(convert_perms, list):
             new_permissions = new_permissions + converted_perms
-        else:
+        elif isinstance(convert_perms, str):
             new_permissions.append(converted_perms)
+        else:
+            logger.warn("Unknown data type of permission {}. '{}'".format(converted_perms, type(converted_perms)))
     return new_permissions
 
 

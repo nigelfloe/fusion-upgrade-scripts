@@ -20,7 +20,7 @@ def update_zk_data(exported_filename):
     if len(dump_json) != 4:
         logger.warn("The exported file does not have an updated list of the params. Skipping any updates in ZK")
 
-    if isinstance(dump_json[3], list):
+    if not isinstance(dump_json[3], list):
         logger.error("The 4th element in the JSON is not an instance of list. "
                      "It is of type '{}'".format(type(dump_json[3])))
 
@@ -32,7 +32,7 @@ def update_zk_data(exported_filename):
             # Get the data from the dump file and update ZK
             if node in dump_json[2]:
                 updated_data = dump_json[2][node]
-                zk.set(node, updated_data, version=stat.version)
+                zk.set(node, bytes(updated_data), version=stat.version)
                 logger.info("Updated ZK node '{}'".format(node))
             else:
                 logger.warn("Could not locate '{}' data in the exported file".format(node))
