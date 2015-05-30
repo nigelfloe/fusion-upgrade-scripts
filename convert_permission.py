@@ -62,11 +62,14 @@ def convert_old_permissions(service_name, method_names, params, type_method_http
         service_info = get_service_info_from_introspect(service_name)
         if service_info is not None:
             root_uri = service_info['uri']
-            if method_names is None or method_names == ["*"]:
+            if method_names == ['*'] and params is None:
                 new_format['methods'] = all_methods
                 new_format['path'] = "{}/**".format(root_uri)
                 return new_format
             else:
+                if method_names == ['*']:
+                    method_names = all_methods
+                    logger.debug("Modified method_names to '{}'".format(method_names))
                 if type_method_http:
                     # Deal with the http verb methods
                     if params is None:
@@ -77,31 +80,36 @@ def convert_old_permissions(service_name, method_names, params, type_method_http
                     else:
                         # Handle permissions with http method and params
                         verb_methods = service_info.get("verb_methods")
+                        logger.debug("verb methods are {}".format(verb_methods))
                         perms = []
                         for verb_name in method_names:
+                            logger.debug("looking up method '{}' in service '{}'".format(verb_name, service_name))
                             methods = verb_methods.get(verb_name)
-                            for method_info in methods:
-                                matched_atleast_one_param = False
-                                path = method_info["uri"]
-                                if "pathParams" in method_info and len(method_info.get("pathParams")) > 0:
-                                    replace_params_with_wildcard = []
-                                    all_params = []
-                                    for each_param in method_info["pathParams"]:
-                                        all_params.append(each_param["name"])
-                                    set_params = frozenset(params)
-                                    set_all_methods = frozenset(all_params)
-                                    # Make sure params have an intersection
-                                    if set_params.issubset(set_all_methods):
-                                        matched_atleast_one_param = True
-                                        replace_params_with_wildcard = set_all_methods.difference(set_params)
-                                        for param_name in set_params:
-                                            if params[param_name] == ["*"]:
-                                                path = path.replace("{" + param_name + "}", "*")
+                            logger.debug("Verb info for method '{}' in service '{}' is {}".format(verb_name, service_name, methods))
+                            if methods is not None:
+                                for method_info in methods:
+                                    logger.debug("Method info for method '{}' is {}".format(verb_name, method_info))
+                                    matched_atleast_one_param = False
+                                    path = method_info["uri"]
+                                    if "pathParams" in method_info and len(method_info.get("pathParams")) > 0:
+                                        replace_params_with_wildcard = []
+                                        all_params = []
+                                        for each_param in method_info["pathParams"]:
+                                            all_params.append(each_param["name"])
+                                        set_params = frozenset(params)
+                                        set_all_methods = frozenset(all_params)
+                                        # Make sure params have an intersection
+                                        if set_params.issubset(set_all_methods):
+                                            matched_atleast_one_param = True
+                                            replace_params_with_wildcard = set_all_methods.difference(set_params)
+                                            for param_name in set_params:
+                                                if params[param_name] == ["*"]:
+                                                    path = path.replace("{" + param_name + "}", "*")
 
-                                    if matched_atleast_one_param:
-                                        for non_matched_param in replace_params_with_wildcard:
-                                            path = path.replace("{" + non_matched_param + "}", "*")
-                                        perms.append({"methods": [verb_name], "path": path, "params": params})
+                                        if matched_atleast_one_param:
+                                            for non_matched_param in replace_params_with_wildcard:
+                                                path = path.replace("{" + non_matched_param + "}", "*")
+                                            perms.append({"methods": [verb_name], "path": path, "params": params})
 
                         return perms
                 else:
@@ -213,9 +221,15 @@ def parse_old_permission(perm):
         services = split_values[0]
         method = split_values[1]
         type_methods_http = False
+        if method is None or method == '':
+            method = '*'
         if method != '*' and method[0] == "#":
             type_methods_http = True
-            method = method[1:]
+            # Remove '#' from each of the method names
+            for i, method_name in enumerate(method.split(",")):
+                method[i] = method_name[1:]
+        elif method == '*':
+            type_methods_http = True
         if len_values == 2:
             for service in services.split(","):
                 converted_perm = convert_old_permissions(service, method.split(","), None, type_method_http=type_methods_http)
@@ -240,8 +254,10 @@ def parse_old_permission(perm):
                             params[param_name] = param_values
             for service in services.split(","):
                 if service in id_mappings:
-                    # Append the 'ID' param
-                    params[id_mappings.get(service)] = split_values[2].split(",")
+                    # Give priority if a value is defined on the params explicitly
+                    if id_mappings.get(service) not in params:
+                        # Append the 'ID' param
+                        params[id_mappings.get(service)] = split_values[2].split(",")
                 else:
                     logger.warn("Unknown id entity  '{}' for service '{}'".format(split_values[2], service))
                 converted_perm = convert_old_permissions(service, method.split(","), params, type_method_http=type_methods_http)
@@ -308,5 +324,5 @@ if __name__ == "__main__":
 
     old_permission = args.old_permission
     introspect_filename = args.introspect_filename
-
-    logger.debug("New permissions after conversion: \n {}".format(convert_perms(old_permission, introspect_filename)))
+    logger.info("old permission: '{}' ".format(old_permission))
+    logger.info("New permissions after conversion: \n {}".format(convert_perms(old_permission, introspect_filename)))
