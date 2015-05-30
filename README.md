@@ -59,7 +59,7 @@ Steps to Upgrade
        cd ..
     ```
 
-8. Copy any changes (after old installation) from `fusion/bin/config.sh` to the new config `fusion-new/bin/config.sh`. Be careful and do *NOT* copy the files as it is since the new config file might have been updated. If you haven't changed anything in your `config.sh`, then there is no need to make any changes to the new instance `config.sh`. Also, check your bin scripts for any changes and substitute them in config.sh
+8. Copy any changes (after old installation) from `fusion/bin/config.sh` to the new config `fusion-new/bin/config.sh`. Be careful and do **NOT** copy the file `config.sh` from old to new, since the new config file might have been updated. If you haven't changed anything in your `config.sh`, then there is no need to make any changes to the new instance `config.sh`. Also, check your bin scripts for any changes and substitute them in config.sh
     * E.g., 1.2.0 has 'JAVA_OPTIONS' setting defined in each individual bash scripts `fusion/bin/solr`, `fusion/bin/connectors`, `fusion/bin/api`, `fusion/bin/ui`. In 1.2.3, we have moved the JAVA_OPTIONS from bin scripts to config.sh. You will see `API_JAVA_OPTIONS`, `CONNECTORS_JAVA_OPTIONS`, `SOLR_JAVA_OPTIONS`, `UI_JAVA_OPTIONS` in `fusion-new/bin/config.sh`. So, if you have made any changes to the `JAVA_OPTIONS` in individual bin scripts, please update the related config in `fusion-new/bin/config.sh`
 
 9. Copy crawldb from old to new Fusion
@@ -71,15 +71,18 @@ Steps to Upgrade
 10. Copy uploaded JDBC drivers
 
   ```
-     cp -r fusion/data/connectors/lucid.jdbc/* fusion-new/data/connectors/lucid.jdbc/
+     cp -R fusion/data/connectors/lucid.jdbc/* fusion-new/data/connectors/lucid.jdbc/
   ```
 
 11. Please follow the different deployment scenarios below
   
    a. If you are using the Fusion-embedded Solr and Zookeeper (Out of the box Fusion):
-      * Stop the Solr service if not already stopped `fusion/bin/solr stop`
-      * Copy ZK configuration data to the new installation `cp -R fusion/solr/zoo* fusion-new/solr/`
+      * Stop the Solr service if not already stopped
+        `fusion/bin/solr stop`
+      * Copy ZK configuration data to the new installation
+        `cp -R fusion/solr/zoo* fusion-new/solr/`
       * move Solr collection data to the new installation: (This might take a while depending on the amount of data in Solr)
+
           ```
               find fusion/solr -depth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
           ```
@@ -124,7 +127,7 @@ Steps to Upgrade
          fusion-new/bin/connectors start
          fusion-new/bin/ui start
        ```
-  
+
   b. If you are using Solr inside Fusion but not the embedded ZK inside Solr, then comment out `-DzkRun` inside the bin scripts `fusion-new/bin/solr` 
 
        ```
@@ -133,11 +136,57 @@ Steps to Upgrade
         fusion-new/bin/connectors start
         fusion-new/bin/ui start
        ```
-       
+
   c. If you are not using Solr inside the Fusion package, then use the below commands to run the other services
-  
+
        ```
          fusion-new/bin/api start
          fusion-new/bin/connectors start
          fusion-new/bin/ui start
        ```
+
+16. Once Admin UI boots up, Log in and ensure that your stuff looks good at this point. Few examples: Check
+
+    i.   If you can access all the collections
+    ii.  If all the permissions for roles are displayed in the UI
+    iii. If you can search data inside collections
+    iv.  Access datasources, etc..
+
+17. Stop the new Fusion:
+
+      ```
+      fusion-new/bin/fusion stop
+      ```
+
+18. Rename the directories:
+
+      ```
+      mv fusion fusion-old
+      mv fusion-new fusion
+      ```
+
+19. Startup Fusion: (Note: If you are not running Solr inside fusion, then comment out the solr script invocations in `fusion/bin/fusion`
+
+     ```
+     fusion/bin/fusion start
+     ```
+
+
+Optional
+--------
+
+#### After successful upgrade
+
+* If you are certain your upgrade was successful, you can delete or archive the old version by deleting or archiving fusion-old
+
+
+#### Rollback to Old version
+
+   * If you want to roll back to old version :
+
+     ```
+      fusion/bin/fusion stop
+      mv fusion fusion-new-rolledback
+      mv fusion-old fusion
+     ```
+
