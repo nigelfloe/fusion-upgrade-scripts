@@ -39,14 +39,14 @@ Steps to Upgrade
        cd fusion-upgrade-scripts
     ```
 
-5. Run the export script against the running zookeeper
+5. Run the export script against the running zookeeper (You need to run this script only once if you have multiple Fusion instances)
 
     ```
       python zk_export.py {zk_address} {output_filename}
       E.g., python zk_export.py localhost:9983 zk_fusion.export
     ```
 
-6. Run the update script against the exported file
+6. Run the update script against the exported file  (You need to run this script only once if you have multiple Fusion instances)
 
     ```
        python convert_zk_data.py {exported file from previous command} {introspect file shipped with scripts} {new file to save updates}
@@ -104,7 +104,7 @@ Steps to Upgrade
        fusion-new/bin/solr start
     ```
 
-13. Change to upgrade scripts directory and run the script to update data inside ZK
+13. Change to upgrade scripts directory and run the script to update data inside ZK  (You need to run this script only once if you have multiple Fusion instances)
 
     ```
       cd fusion-upgrade-scripts
@@ -165,7 +165,7 @@ Steps to Upgrade
       mv fusion-new fusion
       ```
 
-19. Startup Fusion: (Note: If you are not running Solr inside fusion, then comment out the solr script invocations in `fusion/bin/fusion`
+19. Startup Fusion: (Note: If you are not running Solr inside fusion, then comment out the solr script invocations in `fusion/bin/fusion`)
 
      ```
      fusion/bin/fusion start
