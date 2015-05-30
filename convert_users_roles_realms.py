@@ -25,7 +25,10 @@ extra_permissions = {
     "search": [
         {"methods": ["GET", "POST", "PUT"], "path": "/prefs/apps/search/*"}
     ],
-    "collection-admin": [{"methods": ["GET", "POST", "PUT"], "path": "/prefs/apps/search/*"}]
+    "collection-admin": [
+        {"methods": ["GET", "POST", "PUT"], "path": "/prefs/apps/search/*"},
+        {"methods": ["GET"], "path": "/index-pipelines/**"}
+    ]
 }
 
 proxy_zk_nodes = ["/role/", "/realm-config/", "/user/"]
