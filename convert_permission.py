@@ -254,8 +254,10 @@ def parse_old_permission(perm):
                 if service in id_mappings:
                     # Give priority if a value is defined on the params explicitly
                     if id_mappings.get(service) not in params:
-                        # Append the 'ID' param
-                        params[id_mappings.get(service)] = split_values[2].split(",")
+                        if split_values[2] == '' or split_values[2] is None:
+                            params[id_mappings.get(service)] = ['*']
+                        else:
+                            params[id_mappings.get(service)] = split_values[2].split(",")
                 else:
                     logger.warn("Unknown id entity  '{}' for service '{}'".format(split_values[2], service))
                 method_splits = method.split(",")
