@@ -223,21 +223,19 @@ def parse_old_permission(perm):
         type_methods_http = False
         if method is None or method == '':
             method = '*'
-        if method != '*' and method[0] == "#":
-            type_methods_http = True
-            # Remove '#' from each of the method names
-            for i, method_name in enumerate(method.split(",")):
-                method[i] = method_name[1:]
-        elif method == '*':
-            type_methods_http = True
+
         if len_values == 2:
             for service in services.split(","):
-                converted_perm = convert_old_permissions(service, method.split(","), None, type_method_http=type_methods_http)
-                if converted_perm is not None:
-                    if isinstance(converted_perm, list):
-                        converted_perms = converted_perms + converted_perm
-                    else:
-                        converted_perms.append(converted_perm)
+                method_splits = method.split(",")
+                for method in method_splits:
+                    method_name, type_methods_http = check_each_method(method)
+
+                    converted_perm = convert_old_permissions(service, [method_name], None, type_method_http=type_methods_http)
+                    if converted_perm is not None:
+                        if isinstance(converted_perm, list):
+                            converted_perms = converted_perms + converted_perm
+                        else:
+                            converted_perms.append(converted_perm)
             return converted_perms
         elif len_values == 3 or len_values == 4:
             params = dict()
@@ -260,13 +258,25 @@ def parse_old_permission(perm):
                         params[id_mappings.get(service)] = split_values[2].split(",")
                 else:
                     logger.warn("Unknown id entity  '{}' for service '{}'".format(split_values[2], service))
-                converted_perm = convert_old_permissions(service, method.split(","), params, type_method_http=type_methods_http)
-                if converted_perm is not None:
-                    if isinstance(converted_perm, list):
-                        converted_perms = converted_perms + converted_perm
-                    else:
-                        converted_perms.append(converted_perm)
+                method_splits = method.split(",")
+                for method in method_splits:
+                    method_name, type_methods_http = check_each_method(method)
+                    converted_perm = convert_old_permissions(service, [method_name], params, type_method_http=type_methods_http)
+                    if converted_perm is not None:
+                        if isinstance(converted_perm, list):
+                            converted_perms = converted_perms + converted_perm
+                        else:
+                            converted_perms.append(converted_perm)
             return converted_perms
+
+
+def check_each_method(method_name):
+    if method_name[0] == "#":
+        return method_name[1:], True
+    elif method_name == "*":
+        return method_name, True
+    else:
+        return method_name, False
 
 
 def convert_perms(old_perm, introspect_filename):
