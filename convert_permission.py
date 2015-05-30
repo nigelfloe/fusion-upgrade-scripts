@@ -98,8 +98,8 @@ def convert_old_permissions(service_name, method_names, params, type_method_http
                                             all_params.append(each_param["name"])
                                         set_params = frozenset(params)
                                         set_all_methods = frozenset(all_params)
-                                        # Make sure params have an intersection
-                                        if set_params.issubset(set_all_methods):
+                                        # Make sure atleast one param has an intersection
+                                        if not set_params.isdisjoint(set_all_methods):
                                             matched_atleast_one_param = True
                                             replace_params_with_wildcard = set_all_methods.difference(set_params)
                                             for param_name in set_params:
@@ -131,7 +131,7 @@ def convert_old_permissions(service_name, method_names, params, type_method_http
                                     set_params = frozenset(params)
                                     set_all_methods = frozenset(all_params)
                                     # Make sure params have an intersection
-                                    if set_params.issubset(set_all_methods):
+                                    if not set_params.isdisjoint(set_all_methods):
                                         matched_atleast_one_param = True
                                         replace_params_with_wildcard = set_all_methods.difference(set_params)
                                         for param_name in set_params:
@@ -174,8 +174,9 @@ def get_service_info_from_introspect(service_name):
 
 def get_introspect_data(filename):
     f = open(filename)
-    introspect= json.load(f)
-
+    global introspect
+    introspect = json.load(f)
+    introspect["{}::v1".format("searchAppPrefs")] = search_app_prefs
     for service_name in introspect:
        # Re-format the methods so that the uri's can be accessed via verb's
         introspect[service_name]["verb_methods"] = reformat_methods_in_service(introspect[service_name])
@@ -321,12 +322,59 @@ id_mappings = {
     "searchCluster": "id",
     "index-profiles": "alias",
     "query-profiles": "alias",
-    "users": "id"
+    "users": "id",
+    "searchAppPrefs": "id"
 }
+
 all_methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD']
 global_path = "/**"
 introspect = None
 
+search_app_prefs = {
+    "name": "searchAppPrefs",
+    "uri": "/prefs",
+    "methods": [ {
+        "uri": "/prefs/apps/search",
+        "name": "getSearchAppPrefs",
+        "verb": "GET",
+        "pathParams": [],
+        "queryParams": []
+    }, {
+        "uri": "/prefs/apps/search/{id}",
+        "name": "getSearchAppPref",
+        "verb": "GET",
+        "pathParams": [{
+            "name": "id",
+            "type": "String"
+        }],
+        "queryParams": []
+    }, {
+        "uri": "/prefs/apps/search",
+        "name": "createSearchAppPref",
+        "verb": "POST",
+        "pathParams": [],
+        "queryParams": []
+    }, {
+        "uri": "/prefs/apps/search/{id}",
+        "name": "updateSearchAppPref",
+        "verb": "PUT",
+        "pathParams": [{
+            "name": "id",
+            "type": "String"
+                       }],
+        "queryParams": []
+    }, {
+        "uri": "/prefs/apps/search/{id}",
+        "name": "deleteSearchAppPref",
+        "verb": "DELETE",
+        "pathParams": [{
+             "name": "id",
+             "type": "String"
+                       }],
+        "queryParams": []
+    }
+    ]
+}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert permission from 1.2 to 1.4 format. Example: 'reports:#POST'")
