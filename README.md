@@ -1,20 +1,17 @@
 **Upgrade notes for upgrading from 1.2.0, 1.2.1 to 1.2.3**.
 
-TODO: Notify customers to have enough disk space. More disk space than what current fusion directory occupies
-
-TODO: Write how customers can download the upgrade scripts ?
-
 Pre-requisites
 --------------
 
 1. Install Python 2.7.2+, Install python Kazoo library (https://kazoo.readthedocs.org/en/latest/install.html)
-2. `cd` to the base directory of an existing Fusion install. (E.g, if `fusion` is installed at `/opt/lucidworks/fusion`, then do `cd /opt/lucidworks`).
-3. All the below commands assume the user is in the base directory of an existing Fusion install. Copy the latest version of fusion to the base directory.
-4. Download the upgrade scripts from the Git repo
+2. Make sure there is enough free disk space (more than what current fusion directory occupies)
+3. `cd` to the base directory of an existing Fusion install. (E.g, if `fusion` is installed at `/opt/lucidworks/fusion`, then do `cd /opt/lucidworks`).
+4. All the below commands assume the user is in the base directory of an existing Fusion install. Copy the latest version of fusion to the base directory.
+5. Download the upgrade scripts from the Git repo
 
     ```
     curl -L -o fusion-upgrade-scripts.tar.gz http://github.com/Lucidworks/fusion-upgrade-scripts/tarball/1.2.3/
-    mkdir fusion-upgrade-scripts
+    mkdir -p fusion-upgrade-scripts
     tar -C fusion-upgrade-scripts --strip-components=1 -xf fusion-upgrade-scripts.tar.gz
     ```
 
@@ -25,8 +22,8 @@ Steps to Upgrade
 2. Install the new version in a folder next to the old version
 
     ```
-      mkdir fusion-new
-      tar -C fusion-new --strip-components=1 -xf fusion-1.2.n.tar.gz (Substitute fusion-1.2.n.tar.gz with the actual tar file with the new Fusion install) 
+      mkdir -p fusion-new
+      tar -C fusion-new --strip-components=1 -xf fusion-1.2.3.tar.gz (Substitute fusion-1.2.3.tar.gz with the actual tar file of new Fusion install)
     ```
 3. Stop all services of Fusion except ZK
 
@@ -98,12 +95,13 @@ Steps to Upgrade
       * No need to do anything. Proceed to the next step
 
 12. If you are using embedded ZK, start ZK from new Fusion instance. After starting, wait for Solr to show up in the Admin UI at port 8983 (http://localhost:8983/solr)
+    Don't run this if you are not using the embedded ZK inside fusion package
 
     ```
        fusion-new/bin/solr start
     ```
 
-13. Change to upgrade-scripts and run the script to update data inside ZK
+13. Change to upgrade scripts directory and run the script to update data inside ZK
 
     ```
       cd fusion-upgrade-scripts
@@ -111,12 +109,35 @@ Steps to Upgrade
       E.g., python update_zk_data.py localhost:9983 zk_fusion_updated.export
     ```
 
-14. Start the other fusion services in the new instance. (Start each service individually and check the individual logs to make sure there are no errors)
+14. Change back to the base directory
 
-   ```
-     cd ..
-     fusion-new/bin/api start
-     fusion-new/bin/connectors start
-     fusion-new/bin/ui start
-   ```
+    ```
+    cd ..
+    ```
 
+15. Start the fusion services in the new instance. (Start each service individually and check the individual logs to make sure there are no errors)
+  
+  a. If you are using Solr inside Fusion package and embedded Zookeeper within the Solr (Out of the box Fusion):
+
+       ```
+         fusion-new/bin/api start
+         fusion-new/bin/connectors start
+         fusion-new/bin/ui start
+       ```
+  
+  b. If you are using Solr inside Fusion but not the embedded ZK inside Solr, then comment out `-DzkRun` inside the bin scripts `fusion-new/bin/solr` 
+
+       ```
+        fusion-new/bin/solr start
+        fusion-new/bin/api start
+        fusion-new/bin/connectors start
+        fusion-new/bin/ui start
+       ```
+       
+  c. If you are not using Solr inside the Fusion package, then use the below commands to run the other services
+  
+       ```
+         fusion-new/bin/api start
+         fusion-new/bin/connectors start
+         fusion-new/bin/ui start
+       ```
