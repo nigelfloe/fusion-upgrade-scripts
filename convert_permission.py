@@ -241,7 +241,7 @@ def parse_old_permission(perm):
         elif len_values == 3 or len_values == 4:
             params = dict()
             # TODO: Would it be possible to have a permission `collections,query-pipelines:#GET:demo` ?
-            if split_values[2] is None:
+            if split_values[2] is None or split_values[2] == "":
                 split_values[2] = "*"
             if len_values == 4:
                 split_params = split_values[3].split(" ")
