@@ -229,6 +229,8 @@ def parse_old_permission(perm):
             for service in services.split(","):
                 method_splits = method.split(",")
                 for method in method_splits:
+                    if method is None or method == '':
+                        continue
                     method_name, type_methods_http = check_each_method(method)
 
                     converted_perm = convert_old_permissions(service, [method_name], None, type_method_http=type_methods_http)
@@ -253,6 +255,8 @@ def parse_old_permission(perm):
                             params[param_name] = param_values
             for service in services.split(","):
                 if service in id_mappings:
+                    if service is None or service == '':
+                        continue
                     # Give priority if a value is defined on the params explicitly
                     if id_mappings.get(service) not in params:
                         if split_values[2] == '' or split_values[2] is None:
@@ -263,6 +267,8 @@ def parse_old_permission(perm):
                     logger.warn("Unknown id entity  '{}' for service '{}'".format(split_values[2], service))
                 method_splits = method.split(",")
                 for method in method_splits:
+                    if method is None or method == '':
+                        continue
                     method_name, type_methods_http = check_each_method(method)
                     converted_perm = convert_old_permissions(service, [method_name], params, type_method_http=type_methods_http)
                     if converted_perm is not None:
