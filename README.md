@@ -3,7 +3,7 @@
 Pre-requisites
 --------------
 
-1. Install Python 2.7.2+, Install python Kazoo library (https://kazoo.readthedocs.org/en/latest/install.html)
+1. Install Python 2.7.2+ and Kazoo library (https://kazoo.readthedocs.org/en/latest/install.html)
 2. Make sure there is enough free disk space (more than what current fusion directory occupies)
 3. `cd` to the base directory of an existing Fusion install. (E.g, if `fusion` is installed at `/opt/lucidworks/fusion`, then do `cd /opt/lucidworks`).
 4. All the below commands assume the user is in the base directory of an existing Fusion install. Copy the latest version of fusion to the base directory.
@@ -78,8 +78,10 @@ Steps to Upgrade
   
    a. If you are using the Fusion-embedded Solr and Zookeeper (Out of the box Fusion):
       * Stop the Solr service if not already stopped
+    
         `fusion/bin/solr stop`
       * Copy ZK configuration data to the new installation
+    
         `cp -R fusion/solr/zoo* fusion-new/solr/`
       * move Solr collection data to the new installation: (This might take a while depending on the amount of data in Solr)
 
@@ -147,10 +149,10 @@ Steps to Upgrade
 
 16. Once Admin UI boots up, Log in and ensure that your stuff looks good at this point. Few examples: Check
 
-    i.   If you can access all the collections
-    ii.  If all the permissions for roles are displayed in the UI
-    iii. If you can search data inside collections
-    iv.  Access datasources, etc..
+    1.   If you can access all the collections
+    2.  If all the permissions for roles are displayed in the UI
+    3. If you can search data inside collections
+    4.  Access datasources, etc..
 
 17. Stop the new Fusion:
 
@@ -171,7 +173,6 @@ Steps to Upgrade
      fusion/bin/fusion start
      ```
 
-
 Optional
 --------
 
@@ -190,3 +191,7 @@ Optional
       mv fusion-old fusion
      ```
 
+Notes
+-----
+
+* Clear your browser cache after starting Admin UI in the new Fusion instance
