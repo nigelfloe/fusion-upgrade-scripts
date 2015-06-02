@@ -124,28 +124,28 @@ Steps to Upgrade
   
   a. If you are using Solr inside Fusion package and embedded Zookeeper within the Solr (Out of the box Fusion):
 
-       ```
-         fusion-new/bin/api start
-         fusion-new/bin/connectors start
-         fusion-new/bin/ui start
-       ```
+    ```
+     fusion-new/bin/api start
+     fusion-new/bin/connectors start
+     fusion-new/bin/ui start
+    ```
 
   b. If you are using Solr inside Fusion but not the embedded ZK inside Solr, then comment out `-DzkRun` inside the bin scripts `fusion-new/bin/solr` 
 
-       ```
-        fusion-new/bin/solr start
-        fusion-new/bin/api start
-        fusion-new/bin/connectors start
-        fusion-new/bin/ui start
-       ```
+   ```
+    fusion-new/bin/solr start
+    fusion-new/bin/api start
+    fusion-new/bin/connectors start
+    fusion-new/bin/ui start
+   ```
 
   c. If you are not using Solr inside the Fusion package, then use the below commands to run the other services
 
-       ```
-         fusion-new/bin/api start
-         fusion-new/bin/connectors start
-         fusion-new/bin/ui start
-       ```
+   ```
+     fusion-new/bin/api start
+     fusion-new/bin/connectors start
+     fusion-new/bin/ui start
+   ```
 
 16. Once Admin UI boots up, Log in and ensure that your stuff looks good at this point. Few examples: Check
 
