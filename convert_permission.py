@@ -264,7 +264,7 @@ def parse_old_permission(perm):
                         else:
                             params[id_mappings.get(service)] = split_values[2].split(",")
                 else:
-                    logger.warn("Unknown id entity  '{}' for service '{}'".format(split_values[2], service))
+                    logger.warn("Unknown id entity  '{}' for service '{}'. Permission string '{}'".format(split_values[2], service, perm))
                 method_splits = method.split(",")
                 for method in method_splits:
                     if method is None or method == '':
