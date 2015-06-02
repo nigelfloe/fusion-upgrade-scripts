@@ -92,6 +92,7 @@ Steps to Upgrade
    b. If you are using external Zookeeper and using the Solr inside `fusion` directory:
       * Stop the Solr service if not already stopped `fusion/bin/solr stop`
       * move Solr collection data to the new installation:
+      
           ```
               find fusion/solr -depth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
           ```
