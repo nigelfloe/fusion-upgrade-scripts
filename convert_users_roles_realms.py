@@ -60,7 +60,7 @@ def read_users_roles(dump_json):
                 elif proxy_node == "/realm-config/":
                     data = znodes_data[znode]
                     data = json.loads(data)
-                    realm_type = data.get("realm-type")
+                    realm_type = data.get("realm-type") or data.get("realmType")
                     if realm_type in realm_configs:
                         realm_configs[realm_type].append(znode)
                     else:
@@ -143,14 +143,20 @@ def modify_ldap_realms_data(dump):
             data = dump[2][ldap_config_id]
             ldap_config = json.loads(data)
             if "config" in ldap_config:
-                if "base-dn" not in ldap_config["config"]:
-                    if "user-id-attr" in ldap_config["config"] and "user-base-dn" in ldap_config["config"]:
-                        user_id_attr = ldap_config["config"]["user-id-attr"]
-                        user_base_dn = ldap_config["config"]["user-base-dn"]
+                if "bind-dn" not in ldap_config["config"] or "bindDn" in ldap_config["config"]:
+                    if ("user-id-attr" in ldap_config["config"] and "user-base-dn" in ldap_config["config"]) or \
+                            ("userIdAttr" in ldap_config["config"] and "userBaseDn" in ldap_config["config"]):
+                        user_id_attr = ldap_config["config"].get("user-id-attr") or ldap_config["config"].get("userIdAttr")
+                        user_base_dn = ldap_config["config"].get("user-base-dn") or ldap_config["config"].get("userBaseDn")
                         bind_dn_template = user_id_attr + "={}," + user_base_dn
-                        ldap_config["config"]["login"] = {"bind-dn-template": bind_dn_template}
-                        del ldap_config["config"]["user-id-attr"]
-                        del ldap_config["config"]["user-base-dn"]
+                        if "userIdAttr" in ldap_config["config"] and "userBaseDn" in ldap_config["config"]:
+                            ldap_config["config"]["login"] = {"bindDnTemplate": bind_dn_template}
+                            del ldap_config["config"]["userIdAttr"]
+                            del ldap_config["config"]["userBaseDn"]
+                        else:
+                            ldap_config["config"]["login"] = {"bind-dn-template": bind_dn_template}
+                            del ldap_config["config"]["user-id-attr"]
+                            del ldap_config["config"]["user-base-dn"]
                     else:
                         logger.warn("Could not find 'user-id-attr' and/or 'user-base-dn' in ldap realm config {}".format(ldap_config))
                 else:
