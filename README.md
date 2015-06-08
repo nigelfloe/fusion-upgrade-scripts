@@ -86,7 +86,7 @@ Steps to Upgrade
       * move Solr collection data to the new installation: (This might take a while depending on the amount of data in Solr)
 
           ```
-              find fusion/solr -depth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
+              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
           ```
 
    b. If you are using external Zookeeper and using the Solr inside `fusion` directory:
@@ -94,7 +94,7 @@ Steps to Upgrade
       * move Solr collection data to the new installation:
       
           ```
-              find fusion/solr -depth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
+              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
           ```
 
    c. If you are using external Zookeeper and external Solr. (not using Solr, ZK in the fusion directory):
@@ -111,7 +111,7 @@ Steps to Upgrade
 
     ```
       cd fusion-upgrade-scripts
-      python {zk_host} {updated_exported_file_name}
+      python update_zk_data.py {zk_host} {updated_exported_file_name}
       E.g., python update_zk_data.py localhost:9983 zk_fusion_updated.export
     ```
 
@@ -196,3 +196,7 @@ Notes
 -----
 
 * Clear your browser cache after starting Admin UI in the new Fusion instance
+* Warning message below is expected while running the script to convert permissions
+    `2015-06-08 18:54:06,196 - convert_permission - WARNING - 153 - Could not find service name 'hosts' in the introspect`
+* There was a bug in 1.2.1, 1.2.0 that prevented system metrics from being aggregated (in collection system_metrics).
+  After upgrading to 1.2.3, the old system metrics will not be aggregated.
