@@ -65,7 +65,7 @@ Steps to Upgrade
 9. Copy crawldb from old to new Fusion
 
   ```
-      cp -r fusion/data/connectors/crawldb/* fusion-new/data/connectors/crawldb/
+      cp -R fusion/data/connectors/crawldb/* fusion-new/data/connectors/crawldb/
   ```
 
 10. Copy uploaded JDBC drivers
@@ -86,7 +86,7 @@ Steps to Upgrade
       * move Solr collection data to the new installation: (This might take a while depending on the amount of data in Solr)
 
           ```
-              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
+              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -R  $f fusion-new/solr/; done
           ```
 
    b. If you are using external Zookeeper and using the Solr inside `fusion` directory:
@@ -94,7 +94,7 @@ Steps to Upgrade
       * move Solr collection data to the new installation:
       
           ```
-              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -r  $f fusion-new/solr/; done
+              find fusion/solr -maxdepth 1 -mindepth 1 | grep -v -E "zoo*" | while read f ; do cp -R  $f fusion-new/solr/; done
           ```
 
    c. If you are using external Zookeeper and external Solr. (not using Solr, ZK in the fusion directory):
