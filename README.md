@@ -65,13 +65,13 @@ Steps to Upgrade
 9. Copy crawldb from old to new Fusion
 
   ```
-      cp -R fusion/data/connectors/crawldb/* fusion-new/data/connectors/crawldb/
+      cp -R fusion/data/connectors/crawldb fusion-new/data/connectors/
   ```
 
 10. Copy uploaded JDBC drivers
 
   ```
-     cp -R fusion/data/connectors/lucid.jdbc/* fusion-new/data/connectors/lucid.jdbc/
+     cp -R fusion/data/connectors/lucid.jdbc fusion-new/data/connectors/
   ```
 
 11. Please follow the different deployment scenarios below
